@@ -8,7 +8,7 @@
 
 import UIKit
 
-class WeatherViewController: UIViewController, UITextFieldDelegate {
+class WeatherViewController: UIViewController {
 //MARK: variables
     var weatherManager = WeatherManager()
     
@@ -20,24 +20,25 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        weatherManager.delegate = self
         // sets up a notifier of all user interactions with the text field.  Notifies this view controller.
         searchTextField.delegate = self
     }
+}
 
-//MARK: IB actions
+
+//MARK: - UITextFieldDelegate
+extension WeatherViewController: UITextFieldDelegate {
+    //MARK: IB actions
     // When the user presses the magnifying glass search button
     @IBAction func searchPressed(_ sender: UIButton) {
         // force the softkeyboard closed
-        print(searchTextField.text!)
         searchTextField.endEditing(true)
     }
 
-//MARK: Delegate Methods
     // Action to take when the user presses the softkeyboard return key
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         // force the softkeyboard closed
-        print(searchTextField.text!)
         searchTextField.endEditing(true)
         return true
     }
@@ -61,3 +62,19 @@ class WeatherViewController: UIViewController, UITextFieldDelegate {
     }
 }
 
+
+//MARK: - WeatherManagerDelegate
+extension WeatherViewController: WeatherManagerDelegate {
+    func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel) {
+        // When using a long running task like a network call, we need to wrap dependednt data
+        // with the following so it doesn't hang, waiting on the network
+        DispatchQueue.main.async {
+            self.temperatureLabel.text = weather.temperatureString
+            self.conditionImageView.image = UIImage(systemName: weather.conditionName)
+        }
+    }
+    
+    func didFailWithError(error: Error) {
+        print(error)
+    }
+}
