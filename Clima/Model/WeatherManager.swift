@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import CoreLocation
 
 protocol WeatherManagerDelegate {
     func didUpdateWeather(_ weatherManager: WeatherManager, weather: WeatherModel)
@@ -15,6 +16,7 @@ protocol WeatherManagerDelegate {
 
 struct WeatherManager {
     let weatherURL = "https://api.openweathermap.org/data/2.5/weather"
+    // Sign up at openweathermap.org to get your own API key
     let apiKey = ""
     let units = "imperial"
     
@@ -22,6 +24,11 @@ struct WeatherManager {
     
     func fetchWeather(cityName: String) {
         let urlString = "\(weatherURL)?q=\(cityName)&units=\(units)&appid=\(apiKey)"
+        self.performRequest(with: urlString)
+    }
+    
+    func fetchWeather(latitude: CLLocationDegrees, longitude: CLLocationDegrees) {
+        let urlString = "\(weatherURL)?lat=\(latitude)&lon=\(longitude)&units=\(units)&appid=\(apiKey)"
         self.performRequest(with: urlString)
     }
     
